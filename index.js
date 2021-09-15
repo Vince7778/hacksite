@@ -10,7 +10,7 @@ const app = express();
 const port = 3000;
 
 let winners = [];
-let winnerNames = [];
+let winnerNames = {names:[]};
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/index.html"));
@@ -57,15 +57,15 @@ app.get("/winner", (req, res) => {
 
 app.post("/winner", urlencodedParser, (req, res) => {
     let sname = req.body.sname;
-    let inArray = winnerNames.find(v => v.ip === req.ip);
+    let inArray = winnerNames.names.find(v => v.ip === req.ip);
 
     if (!inArray) {
         console.log("submitname", req.ip, sname);
-        winnerNames.push({
+        winnerNames.names.push({
             ip: req.ip,
             name: sname
         });
-        fs.writeFile("winners.json", winnerNames.toString(), () => {});
+        fs.writeFile("winners.json", JSON.stringify(winnerNames), () => {});
         res.redirect("/winner?success=1");
     } else {
         res.redirect("/winner?failed=1");

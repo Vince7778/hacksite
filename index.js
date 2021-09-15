@@ -7,7 +7,7 @@ const fs = require("fs");
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 const app = express();
-const port = 3000;
+const port = 8080;
 
 let winners = [];
 let winnerNames = {names:[]};

@@ -61,6 +61,7 @@
 
         function store() {
             localStorage.setItem("submitted", "1");
+            document.getElementById("submit").disabled = true;
         }
 
         const ls = localStorage.getItem("submitted");

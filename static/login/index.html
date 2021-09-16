@@ -17,9 +17,6 @@
     <div class="d-none alert alert-danger" id="failed-alert">
         Login failed!
     </div>
-    <div class="d-none alert alert-danger" id="attempt-alert">
-        Out of attempts! Sorry!
-    </div>
     <div class="d-none alert alert-success" id="win-alert">
         Good job! You won already!
     </div>
@@ -36,11 +33,11 @@
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password">
         </div>
-        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+        <button type="submit" class="btn btn-primary" id="submit" onclick="submitForm()">Submit</button>
     </form>
     <p class="mt-3">
-        <span id="winners">(loading...)</span> winner(s) so far<br>
-        <span id="attempts">(loading...)</span> attempts remaining
+        <span id="winners">(loading...)</span> winner(s) so far
+        <span id="rfsh"></span>
     </p>
     <small class="text-muted mt-3">
         Created by Conor Kennedy
@@ -56,12 +53,6 @@
             failElem.classList.remove("d-none");
         }
 
-        const attemptLimit = urlParams.get("attemptOut");
-        if (attemptLimit) {
-            const failElem = document.getElementById("attempt-alert");
-            failElem.classList.remove("d-none");
-        }
-
         const winnerReq = new XMLHttpRequest();
         winnerReq.onreadystatechange = () => {
             document.getElementById("winners").innerText = winnerReq.responseText;
@@ -69,16 +60,10 @@
         winnerReq.open("GET", "/api/winnerCount/", true);
         winnerReq.send(null);
 
-        const attemptsReq = new XMLHttpRequest();
-        attemptsReq.onreadystatechange = () => {
-            const resText = attemptsReq.responseText;
-            document.getElementById("attempts").innerText = resText;
-            if (resText === "0") {
-                document.getElementById("submit").disabled = true;
-            }
+        function submitForm() {
+            document.getElementById("submit").disabled = true;
+            document.getElementById("rfsh").innerHTML = "<br>Refresh to submit again";
         }
-        attemptsReq.open("GET", "/api/attemptCount/", true);
-        attemptsReq.send(null);
 
         // note: this code only makes this page know you won, it won't mark you as a winner
         const ls = localStorage.getItem("won");

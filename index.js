@@ -7,12 +7,33 @@ const fs = require("fs");
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 const app = express();
-const port = 8080;
+const port = 80;
 
-let winners = [];
+let users = [];
 let winnerNames = {names:[]};
+let winnerCount = 0;
+
+function getUser(ip) {
+    return users.find(v => v.ip === ip);
+}
+
+function getAttempts(ip) {
+    let fnd = getUser(ip);
+    if (!fnd) {
+        users.push({
+            "ip": ip,
+            "attempts": 10,
+            "won": false
+        });
+        return 10;
+    }
+    return fnd.attempts;
+}
+
+
 
 app.get("/", (req, res) => {
+    console.log("sending")
     res.sendFile(path.join(__dirname, "/static/index.html"));
 });
 
@@ -29,6 +50,11 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", urlencodedParser, (req, res) => {
+    if (getAttempts(req.ip) <= 0) {
+        res.redirect("/login?attemptOut=1");
+        return;
+    }
+
     let username = req.body.username;
     let password = req.body.password;
     console.log("attempt", req.ip, username, password);
@@ -36,18 +62,40 @@ app.post("/login", urlencodedParser, (req, res) => {
     if (username === passwords.user1 && password === passwords.pass1) {
         console.log("password success");
         const ip = req.ip;
-        if (winners.indexOf(ip) === -1) {
-            winners.push(ip);
+        const user = getUser(ip);
+        if (!user) {
+            users.push({
+                "ip": ip,
+                "attempts": 9,
+                "won": true
+            });
+            winnerCount++;
+        } else {
+            if (!user.won) winnerCount++;
+            user.won = true;
+            user.attempts--;
         }
         res.redirect("/winner");
     } else {
+        const ip = req.ip;
+        const user = getUser(ip);
+        if (!user) {
+            users.push({
+                "ip": ip,
+                "attempts": 9,
+                "won": false
+            });
+        } else {
+            user.attempts--;
+        }
         console.log("password failure");
         res.redirect("/login?failed=1");
     }
 });
 
 app.get("/winner", (req, res) => {
-    if (winners.indexOf(req.ip) === -1) {
+    const user = getUser(req.ip);
+    if (!user || !user.won) {
         res.send("You do not have permission to access this page.");
         return;
     }
@@ -73,8 +121,12 @@ app.post("/winner", urlencodedParser, (req, res) => {
 });
 
 app.get("/api/winnerCount", (req, res) => {
-    res.send(winners.length.toString());
-})
+    res.send(winnerCount.toString());
+});
+
+app.get("/api/attemptCount", (req, res) => {
+    res.send(getAttempts(req.ip).toString());
+});
 
 app.listen(port, () => {
     console.log("listening");

@@ -5,6 +5,7 @@ const passwords = require("./passwords.json");
 const fs = require("fs");
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
+const jsonParser = bodyParser.json();
 
 const app = express();
 const port = 80;
@@ -65,6 +66,48 @@ app.post("/winner", urlencodedParser, (req, res) => {
     fs.writeFile("winners.json", JSON.stringify(winnerNames), () => {});
     res.redirect("/winner?success=1&pass="+passwords.pass1);
 });
+
+app.get("/forgot", (req, res) => {
+    res.sendFile(path.join(__dirname, "/static/forgot/index.html"))
+});
+
+app.post("/forgot", jsonParser, (req, res) => {
+    let json = req.body;
+    // user always does not exist for our purposes
+
+    if (!json) {
+        res.send(JSON.stringify({
+            success: false,
+            error: "Server error",
+            password: ""
+        }));
+        return;
+    }
+
+    if (json.username !== "admin") {
+        res.send(JSON.stringify({
+            success: false,
+            error: "User does not exist",
+            password: ""
+        }));
+        return;
+    }
+
+    if (json.isAdmin) {
+        res.send(JSON.stringify({
+            success: true,
+            error: "",
+            password: passwords.pass1
+        }));
+        return;
+    }
+
+    res.send(JSON.stringify({
+        success: false,
+        error: "You are not the admin user!",
+        password: ""
+    }));
+})
 
 app.get("/api/winnerCount", (req, res) => {
     res.send(winnerCount.toString());

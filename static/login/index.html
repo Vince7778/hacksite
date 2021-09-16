@@ -20,6 +20,9 @@
     <div class="d-none alert alert-danger" id="attempt-alert">
         Out of attempts! Sorry!
     </div>
+    <div class="d-none alert alert-success" id="win-alert">
+        Good job! You won already!
+    </div>
     <p class="mt-3">
         <b>PLEASE DO NOT ENTER REAL PASSWORDS IN HERE!</b> I can see them all!<br>
         Also, there is a way to find the answer without guessing.
@@ -72,11 +75,18 @@
             document.getElementById("attempts").innerText = resText;
             if (resText === "0") {
                 document.getElementById("submit").disabled = true;
-                document.getElementById("submit").classList.push("btn-disabled");
             }
         }
         attemptsReq.open("GET", "/api/attemptCount/", true);
         attemptsReq.send(null);
+
+        // note: this code only makes this page know you won, it won't mark you as a winner
+        const ls = localStorage.getItem("won");
+        if (ls && ls === "1") {
+            document.getElementById("submit").disabled = true;
+            const winElem = document.getElementById("win-alert");
+            winElem.classList.remove("d-none");
+        }
     </script>
 </body>
 

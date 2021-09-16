@@ -29,7 +29,7 @@
             <label for="sname">Name</label>
             <input type="text" class="form-control" id="sname" name="sname">
         </div>
-        <button type="submit" class="btn btn-success">Submit</button>
+        <button type="submit" class="btn btn-success" id="submit" onclick="store()">Submit</button>
     </form>
     <small class="text-muted mt-3">
         Created by Conor Kennedy
@@ -56,6 +56,17 @@
         }
         winnerReq.open("GET", "/api/winnerCount/", true);
         winnerReq.send(null);
+
+        localStorage.setItem("won", "1");
+
+        function store() {
+            localStorage.setItem("submitted", "1");
+        }
+
+        const ls = localStorage.getItem("submitted");
+        if (ls && ls === "1") {
+            document.getElementById("submit").disabled = true;
+        }
     </script>
 </body>
 

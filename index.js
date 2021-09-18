@@ -5,7 +5,7 @@ const passwords = require("./passwords.json");
 const fs = require("fs");
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
-const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json({strict: false});
 
 const app = express();
 const port = 80;
@@ -30,14 +30,15 @@ app.get("/login", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/login/index.html"));
 });
 
-app.post("/login", urlencodedParser, (req, res) => {
-    let username = req.body.username;
-    let password = req.body.password;
+app.post("/login", jsonParser, (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const hasWon = req.body.hasWon;
     console.log("attempt", req.ip, username, password);
 
     if (username === passwords.user1 && password === passwords.pass1) {
         console.log("password success");
-        winnerCount++;
+        if (hasWon !== "1") winnerCount++;
         res.redirect("/winner?pass="+passwords.pass1);
     } else {
         console.log("password failure");
@@ -55,12 +56,17 @@ app.get("/winner", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/winner/index.html"));
 });
 
-app.post("/winner", urlencodedParser, (req, res) => {
-    let sname = req.body.sname;
+app.post("/winner", jsonParser, (req, res) => {
+    const sname = req.body.sname;
+    const hasSubmitted = req.body.hasSubmitted;
+
+    if (hasSubmitted) {
+        res.redirect("/winner?failed=1&pass="+passwords.pass1);
+        return;
+    }
 
     console.log("submitname", req.ip, sname);
     winnerNames.names.push({
-        ip: req.ip,
         name: sname
     });
     fs.writeFile("winners.json", JSON.stringify(winnerNames), () => {});

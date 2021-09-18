@@ -22,15 +22,14 @@
     </div>
     <p>
         Congrats! You found the admin password! You are winner #<span id="winners">(loading...)</span><br>
-        Submit your name below to get a shoutout at the first hack club meeting.
+        Submit your name below to get a shoutout at the first hack club meeting.<br>
+        (You can only do this once.)
     </p>
-    <form method="POST">
-        <div class="form-group mb-3">
-            <label for="sname">Name</label>
-            <input type="text" class="form-control" id="sname" name="sname">
-        </div>
-        <button type="submit" class="btn btn-success" id="submit" onclick="store()">Submit</button>
-    </form>
+    <div class="form-group mb-3">
+        <label for="sname">Name</label>
+        <input type="text" class="form-control" id="sname" name="sname">
+    </div>
+    <button type="submit" class="btn btn-success" id="submit" onclick="submitForm()">Submit</button><br>
     <small class="text-muted mt-3">
         Created by Conor Kennedy
     </small>
@@ -59,14 +58,28 @@
 
         localStorage.setItem("won", "1");
 
-        function store() {
+        function submitForm() {
+            const sname = document.getElementById("sname").value;
+            const submitJSON = {
+                sname: sname,
+                hasSubmitted: localStorage.getItem("submitted")
+            };
             localStorage.setItem("submitted", "1");
-            document.getElementById("submit").disabled = true;
-        }
 
-        const ls = localStorage.getItem("submitted");
-        if (ls && ls === "1") {
-            document.getElementById("submit").disabled = true;
+            fetch("/winner", {
+                method: "POST",
+                body: JSON.stringify(submitJSON),
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                redirect: "follow"
+            }).then(res => {
+                if (res.redirected) {
+                    window.location.href = res.url;
+                } else {
+                    alert("Something went wrong with submitting the form. Try again later");
+                }
+            });
         }
     </script>
 </body>

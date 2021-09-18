@@ -11,7 +11,14 @@ const app = express();
 const port = 80;
 
 let winnerNames = {names:[]};
-let winnerCount = 0;
+
+const WINNERS_PATH = path.join(__dirname, "/winners.json");
+if (fs.existsSync(WINNERS_PATH)) {
+    const rawRead = fs.readFileSync(WINNERS_PATH);
+    winnerNames = JSON.parse(rawRead);
+}
+
+let winnerCount = winnerNames.names.length || 0;
 
 app.get("/", (req, res) => {
     console.log("sending", req.ip);

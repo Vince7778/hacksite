@@ -21,7 +21,7 @@
         Successfully submitted name
     </div>
     <p>
-        Congrats! You found the admin password! You are winner #<span id="winners">(loading...)</span><br>
+        Congrats! You found the admin password! <span id="winners"></span><br>
         Submit your name below to get a shoutout at the first hack club meeting.<br>
         (You can only do this once.)
     </p>
@@ -49,12 +49,15 @@
             succElem.classList.remove("d-none");
         }
 
-        const winnerReq = new XMLHttpRequest();
-        winnerReq.onreadystatechange = () => {
-            document.getElementById("winners").innerText = winnerReq.responseText;
+        if (!localStorage.getItem("won")) {
+            const winnerReq = new XMLHttpRequest();
+            winnerReq.onreadystatechange = () => {
+                document.getElementById("winners").innerText = "You are winner #"+winnerReq.responseText;
+            }
+            winnerReq.open("GET", "/api/winnerCount/", true);
+            winnerReq.send(null);
         }
-        winnerReq.open("GET", "/api/winnerCount/", true);
-        winnerReq.send(null);
+        
 
         localStorage.setItem("won", "1");
 

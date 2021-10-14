@@ -126,6 +126,10 @@ app.get("/api/winnerCount", (req, res) => {
     res.send(winnerCount.toString());
 });
 
+const imageDir = path.join(__dirname, "hosted");
+
+app.use("/hosted", express.static(imageDir));
+
 app.listen(port, () => {
     console.log("listening");
 });

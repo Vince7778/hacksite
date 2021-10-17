@@ -3,12 +3,17 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const passwords = require("./passwords.json");
 const fs = require("fs");
+const https = require("https");
 
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const jsonParser = bodyParser.json({strict: false});
 
+const domain = fs.readFileSync("domain.txt");
+const privKey = fs.readFileSync("sslcert/"+domain+".key");
+const cert = fs.readFileSync("sslcert/"+domain+".csr");
 const app = express();
-const port = 80;
+const port = 443;
+const server = https.createServer({key: privKey, cert: cert}, app);
 
 let winnerNames = {names:[]};
 
@@ -130,6 +135,6 @@ const imageDir = path.join(__dirname, "hosted");
 
 app.use("/hosted", express.static(imageDir));
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log("listening");
 });

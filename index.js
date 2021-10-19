@@ -8,9 +8,9 @@ const https = require("https");
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const jsonParser = bodyParser.json({strict: false});
 
-const domain = fs.readFileSync("domain.txt").toString().trimEnd();
-const privKey = fs.readFileSync(path.join(__dirname, "sslcert/"+domain+".key"));
-const cert = fs.readFileSync(path.join(__dirname, "sslcert/"+domain+".csr"));
+const domain = require("./domain.json");
+const privKey = fs.readFileSync(domain.key);
+const cert = fs.readFileSync(domain.cert);
 const app = express();
 const port = 443;
 const server = https.createServer({key: privKey, cert: cert}, app);

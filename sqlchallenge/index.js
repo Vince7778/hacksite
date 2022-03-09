@@ -42,7 +42,7 @@ router.get("/queryName", (req, res) => {
         if (err) {
             console.log("Error", err.message);
             res.statusCode = 400;
-            res.json({status:400,err:err.message});
+            res.json({status:400,err:"Error with command " + sqlQry + ": "+err.message});
             return;
         }
         console.log(rows);

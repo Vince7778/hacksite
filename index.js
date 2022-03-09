@@ -135,6 +135,10 @@ const imageDir = path.join(__dirname, "hosted");
 
 app.use("/hosted", express.static(imageDir));
 
+const sqlChallenge = require("./sqlchallenge/index.js");
+
+app.use("/sqlchallenge", sqlChallenge);
+
 server.listen(port, () => {
     console.log("listening");
 });

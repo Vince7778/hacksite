@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>SQL Challenge</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/bootstrap.min.css'>
+    <script src='/bootstrap.min.js'></script>
+</head>
+<body class="p-3">
+    <h1>SQL Challenge</h1>
+    <div class="mt-3">
+        <label for="nameInput">Enter a username to see how much money they have!</label><br>
+        <input id="nameInput" type="text" class="mt-2"><br>
+        <button class="btn btn-primary mt-2" onclick="submitName()">Submit</button>
+    </div>
+    <div class="alert alert-danger mt-3" style="display: none;" id="error-alert"></div>
+    <div class="mt-3" id="results"></div>
+
+    <small class="text-muted mt-3">
+        Created by Conor Kennedy
+    </small>
+
+    <script>
+        function submitName() {
+            const name = document.getElementById("nameInput").value;
+            fetch(`/sqlchallenge/queryName?name=${name}`).then(async res => {
+                const val = await res.json();
+                const errorDiv = document.getElementById("error-alert");
+                if (res.status !== 200) {
+                    errorDiv.style.display = "block";
+                    errorDiv.innerText = val.err;
+                    return;
+                }
+
+                errorDiv.style.display = "none";
+
+                const table = document.createElement("table");
+                table.className = "table table-bordered";
+                table.style.width = "auto";
+                table.innerHTML = "<thead><tr><th>Name</th><th>Money</th></tr></thead>";
+
+                const tbody = document.createElement("tbody");
+                val.res.forEach(v => {
+                    const row = document.createElement("tr");
+                    Object.values(v).forEach(tk => {
+                        row.innerHTML += "<td>"+tk+"</td>";
+                    });
+                    tbody.appendChild(row);
+                });
+                table.appendChild(tbody);
+
+                document.getElementById("results").replaceChildren(table);
+            })
+        }
+    </script>
+</body>
+</html>

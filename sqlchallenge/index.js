@@ -48,7 +48,7 @@ function setupDB() {
         ['robert', 'bobby tables', 1337],
         ['cat', 'pebble', 348973489],
         ['steve', 'steve', 1],
-        ['flag_${randomValue}', 'The answer is: ', Number(flag)]
+        [`flag_${randomValue}`, 'The answer is: ', Number(flag)]
     ];
 
     const st2 = db.prepare("INSERT INTO Users_New (name, nickname, cash_in_dollars) VALUES (?, ?, ?)");

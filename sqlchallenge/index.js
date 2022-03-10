@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const bodyParser = require("body-parser");
+const jsonParser = bodyParser.json({strict: false});
 const fs = require("fs");
 
 const flag = fs.readFileSync(path.join(__dirname, "flag.txt"));
@@ -15,33 +16,51 @@ function setupDB() {
     db.run("CREATE TABLE Users_New (name TEXT, nickname TEXT, cash_in_dollars INTEGER)");
 
     const values = [
-        "('conor', 100)",
-        "('mr. osborne', 400)",
-        "('aadit', -100)",
-        "('elon musk', 0.01)",
-        "('admin', 123)",
-        "('me', 0)",
-        "('Thank you hacker!', 402)",
-        "('But our flag', 403)",
-        "('is in another table!', 404)",
-        "('(called \"Users_New\")', 405)"
+        ['conor', 100],
+        ['mr. osborne', 400],
+        ['aadit', -100],
+        ['elon musk', 0.01],
+        ['admin', 123],
+        ['me', 0],
+        ['jonathan smith', 1000],
+        ['Thank you hacker!', 402],
+        ['But our flag', 403],
+        ['is in another table!', 404],
+        ['(called \"Users_New\")', 405]
+    ];
+    const st1 = db.prepare("INSERT INTO Users (name, money) VALUES (?, ?)");
+    values.forEach(v => {
+        st1.run(v);
+    });
+
+    const randomValue = Math.floor(Math.random()*1000000);
+    const values2 = [
+        ['conor', 'conor', 100],
+        ['mr. osborne', 'mr. osborne', 400],
+        ['aadit', 'aadit', -100],
+        ['elon musk', 'elon', 0.01],
+        ['admin', 'admin', 123],
+        ['me', 'me', 0],
+        ['jonathan smith', 'jon', 1000],
+        ['flag_${randomValue}', 'The answer is: ', Number(flag)]
     ];
 
-    db.run("INSERT INTO Users (name, money) VALUES "+values.join(","));
-    const randomValue = Math.floor(Math.random()*1000000);
-    db.run(`INSERT INTO Users_New (name, nickname, cash_in_dollars) VALUES ('flag_${randomValue}', 'The answer is: ', ${flag})`);
+    const st2 = db.prepare("INSERT INTO Users_New (name, nickname, cash_in_dollars) VALUES (?, ?, ?)");
+    values2.forEach(v => {
+        st2.run(v);
+    });
 }
 db.serialize(setupDB);
 
 router.use("/", express.static(path.join(__dirname, "static/index.html")));
 
-router.get("/queryName", (req, res) => {
-    const qry = req.query.name.toLowerCase();
-    if (!qry) {
+router.post("/queryName", jsonParser, (req, res) => {
+    if (!req.body || !req.body.name) {
         res.statusCode = 400;
         res.json({status:400,err:'Missing name'});
         return;
     }
+    const qry = req.body.name.toLowerCase();
     
     // !!! INTENTIONALLY VULNERABLE !!!
     const sqlQry = `SELECT * FROM Users WHERE name='${qry}'`;

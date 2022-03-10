@@ -23,6 +23,9 @@ function setupDB() {
         ['admin', 123],
         ['me', 0],
         ['jonathan smith', 1000],
+        ['robert', 1337],
+        ['cat', 348973489],
+        ['steve', 1],
         ['Thank you hacker!', 402],
         ['But our flag', 403],
         ['is in another table!', 404],
@@ -42,6 +45,9 @@ function setupDB() {
         ['admin', 'admin', 123],
         ['me', 'me', 0],
         ['jonathan smith', 'jon', 1000],
+        ['robert', 'bobby tables', 1337],
+        ['cat', 'pebble', 348973489],
+        ['steve', 'steve', 1],
         ['flag_${randomValue}', 'The answer is: ', Number(flag)]
     ];
 

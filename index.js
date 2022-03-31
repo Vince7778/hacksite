@@ -38,7 +38,7 @@ app.get("/bootstrap.min.css", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/bootstrap.min.css"));
 });
 
-app.get("/login", (req, res) => {
+app.get("/login/", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/login/index.html"));
 });
 
@@ -58,7 +58,7 @@ app.post("/login", jsonParser, (req, res) => {
     }
 });
 
-app.get("/winner", (req, res) => {
+app.get("/winner/", (req, res) => {
     const pass = req.query.pass;
     if (!pass || pass !== passwords.pass1) {
         res.send("You do not have permission to access this page.");
@@ -85,7 +85,7 @@ app.post("/winner", jsonParser, (req, res) => {
     res.redirect("/winner?success=1&pass="+passwords.pass1);
 });
 
-app.get("/forgot", (req, res) => {
+app.get("/forgot/", (req, res) => {
     res.sendFile(path.join(__dirname, "/static/forgot/index.html"))
 });
 
@@ -133,11 +133,15 @@ app.get("/api/winnerCount", (req, res) => {
 
 const imageDir = path.join(__dirname, "hosted");
 
-app.use("/hosted", express.static(imageDir));
+app.use("/hosted/", express.static(imageDir));
 
 const sqlChallenge = require("./sqlchallenge/index.js");
 
-app.use("/sqlchallenge", sqlChallenge);
+app.use("/sqlchallenge/", sqlChallenge);
+
+import("./jump-game/index.js").then(res => {
+    app.use("/jumpgame/", res.default);
+});
 
 server.listen(port, () => {
     console.log("listening");
